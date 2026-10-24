@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Français A2 · Llegir, escoltar i parlar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+
+:root{
+  --paper:#FBFCFE; --surface:#FFFFFF; --ink:#1E2B5C; --text:#23262E; --muted:#5B6070;
+  --rule:#C9D4EE; --rule-strong:#9FB2DF; --margin:#D9574F; --accent:#2F55C8; --accent-soft:#E6ECFB;
+  --ok:#1F7A4D; --ok-soft:#E3F3EA; --ko:#B3372F; --ko-soft:#FBE7E5; --line:#E2E6EF;
+  --serif:"Literata", Georgia, "Times New Roman", serif;
+  --sans:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141A2E; --surface:#1A2138; --ink:#C9D6FF; --text:#E6E8EE; --muted:#A3A9BA;
+    --rule:#26304D; --rule-strong:#34426A; --margin:#B5524C; --accent:#8EA8FF; --accent-soft:#25304F;
+    --ok:#7BD3A3; --ok-soft:#1C3529; --ko:#F29B93; --ko-soft:#3D2222; --line:#2B3350;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141A2E; --surface:#1A2138; --ink:#C9D6FF; --text:#E6E8EE; --muted:#A3A9BA;
+  --rule:#26304D; --rule-strong:#34426A; --margin:#B5524C; --accent:#8EA8FF; --accent-soft:#25304F;
+  --ok:#7BD3A3; --ok-soft:#1C3529; --ko:#F29B93; --ko-soft:#3D2222; --line:#2B3350;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--sans);font-size:1.0625rem;line-height:1.55}
+.wrap{max-width:46rem;margin:0 auto;padding:1.5rem 1.1rem 4rem}
+header h1{font-family:var(--serif);font-weight:600;color:var(--ink);font-size:2.1rem;line-height:1.15;margin:.5rem 0 .25rem}
+header p{margin:0;color:var(--muted)}
+nav.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0 1.25rem}
+.tab{font:inherit;font-size:.95rem;border:1.5px solid var(--line);background:var(--surface);color:var(--text);padding:.5rem .9rem;border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+button:focus-visible,input:focus-visible,summary:focus-visible,.s:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h2{font-family:var(--serif);font-weight:600;color:var(--ink);font-size:1.6rem;margin:0 0 .2rem}
+h3{font-size:1.15rem;margin:2.2rem 0 .6rem;color:var(--ink)}
+.topic{color:var(--muted);margin:0 0 1rem}
+.player{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;margin-bottom:.9rem}
+.btn{font:inherit;font-weight:700;border:0;background:var(--accent);color:var(--surface);padding:.6rem 1.05rem;border-radius:.6rem;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn.small{font-size:.9rem;padding:.35rem .7rem;font-weight:400}
+.speed{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.95rem}
+.speed input{accent-color:var(--accent)}
+.hint{font-size:.92rem;color:var(--muted);margin:0 0 .6rem}
+.voice-warn{font-size:.92rem;color:var(--ko);background:var(--ko-soft);padding:.6rem .8rem;border-radius:.5rem;display:none}
+
+/* Cahier Seyès */
+.cahier{
+  --l:32px;
+  position:relative;border-radius:.4rem;border:1px solid var(--line);
+  padding:var(--l) 1.1rem var(--l) 3.6rem;
+  background-color:var(--surface);
+  background-image:
+    linear-gradient(to right, transparent 2.6rem, var(--margin) 2.6rem, var(--margin) calc(2.6rem + 2px), transparent calc(2.6rem + 2px)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--l) - 1px), var(--rule-strong) calc(var(--l) - 1px), var(--rule-strong) var(--l)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent 7px, var(--rule) 7px, var(--rule) 8px);
+  font-family:var(--serif);font-size:1.15rem;line-height:var(--l);color:var(--text);
+}
+.cahier p{margin:0 0 var(--l)}
+.cahier p:last-child{margin-bottom:0}
+.cahier p.dlg{margin-bottom:0}
+.cahier p.dlg + p:not(.dlg){margin-top:var(--l)}
+.s{cursor:pointer;border-radius:3px;padding:0 1px;transition:background-color .15s}
+.s:hover{background:var(--accent-soft)}
+.s.on{background:var(--accent-soft);color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+
+details.vocab{margin-top:1rem;border:1px solid var(--line);border-radius:.6rem;background:var(--surface)}
+details.vocab summary{cursor:pointer;padding:.7rem .9rem;font-weight:700;color:var(--ink)}
+.vocab dl{margin:0;padding:0 .9rem .8rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.35rem 1rem}
+.vocab dt{font-family:var(--serif);font-weight:600}
+.vocab dd{margin:0;color:var(--muted)}
+
+.q{background:var(--surface);border:1px solid var(--line);border-radius:.6rem;padding:.85rem 1rem;margin-bottom:.7rem}
+.q p{margin:0 0 .5rem;font-family:var(--serif);font-size:1.08rem}
+.opts{display:flex;flex-wrap:wrap;gap:.45rem}
+.opts label{display:flex;align-items:center;gap:.4rem;border:1.5px solid var(--line);border-radius:.5rem;padding:.35rem .7rem;cursor:pointer}
+.opts input{accent-color:var(--accent)}
+.opts label.right{border-color:var(--ok);background:var(--ok-soft)}
+.opts label.wrong{border-color:var(--ko);background:var(--ko-soft)}
+.score{font-weight:700;margin-left:.8rem;color:var(--ink)}
+
+ul.talk{margin:0;padding-left:1.2rem;font-family:var(--serif);font-size:1.08rem}
+ul.talk li{margin-bottom:.35rem}
+.rep{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem;background:var(--surface);border:1px solid var(--line);border-radius:.6rem;padding:.7rem 1rem;margin-bottom:.6rem}
+.rep span{font-family:var(--serif);font-size:1.08rem;flex:1 1 16rem}
+.task{border-left:4px solid var(--margin);background:var(--surface);padding:.9rem 1rem;border-radius:0 .6rem .6rem 0}
+.task p{margin:0 0 .8rem}
+.rec-out{margin-top:.7rem;font-size:.95rem;color:var(--muted)}
+.rec-out audio{width:100%;max-width:100%;margin-top:.4rem}
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem;margin:1.2rem 0 .4rem}
+.who label{font-weight:700;color:var(--ink)}
+.who input,textarea{font:inherit;color:var(--text);background:var(--surface);border:1.5px solid var(--line);border-radius:.5rem;padding:.45rem .7rem}
+.who input{flex:1 1 14rem;max-width:22rem}
+ol.steps{margin:.8rem 0 0;padding-left:1.3rem;color:var(--muted)}
+ol.steps li{margin-bottom:.15rem}
+.checks{display:flex;flex-direction:column;gap:.45rem}
+.checks label{display:flex;align-items:flex-start;gap:.55rem;background:var(--surface);border:1px solid var(--line);border-radius:.5rem;padding:.55rem .8rem;cursor:pointer}
+.checks input{accent-color:var(--accent);margin-top:.3rem}
+textarea{display:block;width:100%;white-space:pre;overflow-x:auto;margin:.4rem 0 .8rem;line-height:1.5}
+footer{margin-top:3rem;color:var(--muted);font-size:.9rem}
+@media (max-width:520px){
+  header h1{font-size:1.7rem}
+  .cahier{padding-left:2.6rem;font-size:1.06rem;
+    background-image:
+      linear-gradient(to right, transparent 1.8rem, var(--margin) 1.8rem, var(--margin) calc(1.8rem + 2px), transparent calc(1.8rem + 2px)),
+      repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--l) - 1px), var(--rule-strong) calc(var(--l) - 1px), var(--rule-strong) var(--l)),
+      repeating-linear-gradient(to bottom, transparent 0, transparent 7px, var(--rule) 7px, var(--rule) 8px);}
+  .vocab dl{grid-template-columns:1fr}
+  .vocab dd{margin-bottom:.4rem}
+}
+@media (prefers-reduced-motion:reduce){.s{transition:none}}
+.saved{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem;color:var(--ok);background:var(--ok-soft);border-radius:999px;padding:.2rem .75rem;margin-top:.6rem}
+.saved.warn{color:var(--ko);background:var(--ko-soft)}
+.notes{width:100%;min-height:7rem;white-space:pre-wrap;font-family:var(--serif);font-size:1.05rem;margin:.6rem 0 1rem;resize:vertical}
+.recbar{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+.files{list-style:none;margin:.4rem 0 1rem;padding:0}
+.files li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;background:var(--surface);border:1px solid var(--line);border-radius:.5rem;padding:.55rem .8rem;margin-bottom:.45rem}
+.files .none{color:var(--muted)}
+ol.how{margin:.4rem 0 1.2rem;padding-left:1.3rem}
+ol.how li{margin-bottom:.25rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Français A2</h1>
+    <p>Llegeix, escolta i parla. Tres textos amb àudio, preguntes i pràctica oral.</p>
+    <div class="who"><label for="nom">El teu nom</label><input id="nom" type="text" autocomplete="name" placeholder="Nom i cognom"></div>
+    <ol class="steps"><li>Llegeix el text i escolta’l.</li><li>Respon les preguntes i prem Corregir.</li><li>Prepara la tasca oral i grava’t.</li><li>A la pestanya Lliurar, descarrega els fitxers i puja’ls a la tasca del Classroom.</li></ol>
+    <span class="saved" id="saved" aria-live="polite">Tot el que facis es desa automàticament</span>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="app"></main>
+  <footer>L’àudio fa servir la veu en francès del teu dispositiu. Si sona en una altra llengua, instal·la una veu francesa als ajustos del sistema.</footer>
+</div>
+<script>
+const DATA = [
+{
+  id:"texte-1", title:"Une journée de Léa", topic:"Vida quotidiana i rutines · present",
+  paras:[
+    ["Léa a vingt-six ans.","Elle habite à Toulouse, dans un petit appartement près du centre.","Elle est infirmière à l’hôpital."],
+    ["Du lundi au vendredi, elle se lève à six heures et demie.","D’abord, elle prend une douche, puis elle prend son petit-déjeuner : un café, du pain et de la confiture.","Elle va au travail à vélo, parce que c’est rapide et pas cher."],
+    ["Elle commence à huit heures.","Le matin, elle s’occupe des patients et elle parle avec les médecins.","À midi, elle mange à la cafétéria avec ses collègues.","Le travail est fatigant, mais Léa aime beaucoup son métier."],
+    ["Elle finit à seize heures.","Le soir, deux fois par semaine, elle va à la piscine.","Les autres jours, elle cuisine, elle lit ou elle regarde une série.","Elle se couche vers vingt-trois heures."],
+    ["Le week-end, elle ne se lève pas tôt !","Le samedi, elle fait les courses et le dimanche, elle déjeune chez ses parents."]
+  ],
+  vocab:[["se lever","llevar-se"],["une infirmière","una infermera"],["le petit-déjeuner","l’esmorzar"],["fatigant","cansat, esgotador"],["le métier","l’ofici, la professió"],["faire les courses","fer la compra"],["se coucher","anar a dormir"],["tôt","d’hora"]],
+  quiz:[
+    {q:"Quel est le métier de Léa ?",o:["Professeure","Infirmière","Médecin"],a:1},
+    {q:"Comment est-ce qu’elle va au travail ?",o:["En bus","À pied","À vélo"],a:2},
+    {q:"Où est-ce qu’elle mange à midi ?",o:["Chez elle","À la cafétéria","Au restaurant"],a:1},
+    {q:"Léa habite dans une grande maison.",vf:false},
+    {q:"Elle va à la piscine deux fois par semaine.",vf:true},
+    {q:"Le dimanche, elle déjeune chez ses parents.",vf:true}
+  ],
+  talk:["À quelle heure est-ce que tu te lèves ?","Comment est-ce que tu vas au travail ou à l’école ?","Qu’est-ce que tu fais le soir ?","Qu’est-ce que tu aimes faire le week-end ?"],
+  repeat:["Elle se lève à six heures et demie.","Elle va au travail à vélo, parce que c’est rapide.","Le travail est fatigant, mais elle aime son métier."],
+  task:"Présente ta journée typique pendant une minute. Utilise ces mots : d’abord, puis, ensuite, le soir."
+},
+{
+  id:"texte-2", title:"Un week-end à Lyon", topic:"Viatges i ciutat · passé composé",
+  paras:[
+    ["Le mois dernier, Karim et son amie Sofia sont allés à Lyon pour le week-end.","Ils sont partis de Paris le vendredi soir en train.","Le voyage a duré deux heures.","Ils ont dormi dans un petit hôtel près de la place Bellecour."],
+    ["Le samedi matin, ils ont visité le Vieux Lyon, avec ses rues étroites et ses vieilles maisons.","Ensuite, ils sont montés à pied jusqu’à la basilique de Fourvière.","C’était difficile, mais la vue sur la ville était magnifique !"],
+    ["À midi, ils ont mangé dans un bouchon, un restaurant typique de Lyon.","Sofia a pris une salade lyonnaise et Karim a goûté une spécialité locale.","L’après-midi, il a plu, alors ils sont allés au musée des Confluences."],
+    ["Le dimanche, il a fait beau.","Ils ont loué des vélos et ils se sont promenés au bord du Rhône.","Ils sont rentrés à Paris le dimanche soir, un peu fatigués mais très contents."]
+  ],
+  vocab:[["le mois dernier","el mes passat"],["étroit","estret"],["monter à pied","pujar a peu"],["la vue","la vista"],["goûter","tastar"],["il a plu","va ploure"],["louer","llogar"],["au bord de","a la vora de"]],
+  quiz:[
+    {q:"Comment est-ce qu’ils sont allés à Lyon ?",o:["En voiture","En train","En avion"],a:1},
+    {q:"Qu’est-ce qu’un « bouchon » à Lyon ?",o:["Un musée","Un hôtel","Un restaurant typique"],a:2},
+    {q:"Pourquoi est-ce qu’ils sont allés au musée ?",o:["Parce qu’il a plu","Parce qu’ils étaient fatigués","Parce que c’était gratuit"],a:0},
+    {q:"Le voyage a duré quatre heures.",vf:false},
+    {q:"Ils sont montés à Fourvière en bus.",vf:false},
+    {q:"Le dimanche, il a fait beau.",vf:true}
+  ],
+  talk:["Est-ce que tu as visité une ville récemment ?","Avec qui est-ce que tu es parti(e) ?","Qu’est-ce que tu as mangé ?","Tu préfères les musées ou les promenades ? Pourquoi ?"],
+  repeat:["Ils sont partis en train le vendredi soir.","La vue sur la ville était magnifique !","L’après-midi, il a plu, alors ils sont allés au musée."],
+  task:"Raconte un voyage ou une sortie au passé. Dis où tu es allé(e), avec qui, et trois choses que tu as faites."
+},
+{
+  id:"texte-3", title:"Au marché", topic:"Menjar i compres · diàleg",
+  paras:[
+    ["Tous les samedis, Madame Petit va au marché de son quartier.","Aujourd’hui, elle va chez le marchand de fruits et légumes."],
+    {d:["— Bonjour Madame ! Qu’est-ce que je vous sers ?"]},
+    {d:["— Bonjour ! Je voudrais un kilo de tomates, s’il vous plaît."]},
+    {d:["— Voilà. Et avec ça ?"]},
+    {d:["— Vous avez des fraises ?"]},
+    {d:["— Oui, elles sont délicieuses cette semaine.","C’est quatre euros la barquette."]},
+    {d:["— D’accord, j’en prends deux.","Et aussi trois courgettes et une salade."]},
+    {d:["— Très bien. C’est tout ?"]},
+    {d:["— Ah non, il me faut aussi des oignons. Un demi-kilo, s’il vous plaît."]},
+    {d:["— Voilà, Madame. Ça fait quinze euros cinquante."]},
+    {d:["— Je peux payer par carte ?"]},
+    {d:["— Bien sûr !"]},
+    {d:["— Merci beaucoup, bonne journée !"]},
+    {d:["— Merci, à samedi prochain !"]},
+    ["Ensuite, Madame Petit va à la boulangerie.","Elle achète une baguette et deux croissants pour le petit-déjeuner du dimanche."]
+  ],
+  vocab:[["Qu’est-ce que je vous sers ?","Què li poso?"],["Et avec ça ?","Alguna cosa més?"],["une barquette","una safata, una terrina"],["j’en prends deux","en prenc dues"],["il me faut","em cal, necessito"],["ça fait…","són… (el preu)"],["payer par carte","pagar amb targeta"],["la boulangerie","la fleca"]],
+  quiz:[
+    {q:"Combien de barquettes de fraises est-ce qu’elle achète ?",o:["Une","Deux","Trois"],a:1},
+    {q:"Comment est-ce qu’elle paie ?",o:["En espèces","Par carte","Par chèque"],a:1},
+    {q:"Qu’est-ce qu’elle achète à la boulangerie ?",o:["Une baguette et deux croissants","Deux baguettes","Un gâteau"],a:0},
+    {q:"Madame Petit va au marché tous les dimanches.",vf:false},
+    {q:"Les fraises coûtent quatre euros la barquette.",vf:true},
+    {q:"Elle achète un kilo d’oignons.",vf:false}
+  ],
+  talk:["Où est-ce que tu fais tes courses ?","Qu’est-ce que tu achètes souvent ?","Tu préfères le marché ou le supermarché ? Pourquoi ?"],
+  repeat:["Je voudrais un kilo de tomates, s’il vous plaît.","D’accord, j’en prends deux.","Je peux payer par carte ?"],
+  task:"Joue la scène avec un ou une camarade : un client et un marchand. Achète trois produits, demande le prix et paie."
+}
+];
+
+/* Tipografia francesa: espai fi abans de ? ! : ; */
+const fr = t => t.replace(/ ([?!:;»])/g,"\u202F$1").replace(/« /g,"«\u202F");
+const esc = t => String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CHECKS = ["He escoltat el text sencer almenys una vegada.","He repetit les frases model en veu alta.","He fet la tasca oral i me l’he escoltada."];
+
+/* ---------- Desat automàtic ---------- */
+const KEY = "fr-a2-progress-v1";
+let store = {name:"",t:{}}, canSave = true;
+try{ const raw=localStorage.getItem(KEY); if(raw){ const p=JSON.parse(raw); if(p && p.t) store=p; } }catch(e){ canSave=false; }
+function st(id){ const s = store.t[id] || (store.t[id]={}); s.ans=s.ans||{}; s.checks=s.checks||{}; if(!("first" in s)) s.first=null; if(!("last" in s)) s.last=null; return s; }
+function save(){
+  const el=document.getElementById("saved");
+  try{
+    localStorage.setItem(KEY, JSON.stringify(store));
+    const h=new Date().toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"});
+    el.className="saved"; el.textContent=`✓ Desat automàticament a les ${h}`;
+  }catch(e){
+    el.className="saved warn"; el.textContent="Aquest navegador no deixa desar (potser és una finestra privada). Lliura la feina abans de tancar.";
+  }
+}
+let notesTimer=null;
+
+/* ---------- Gravacions desades (IndexedDB) ---------- */
+function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open("fr-a2-rec",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("rec"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function recOp(mode,fn){ const db=await idb(); return new Promise((res,rej)=>{
+  const tx=db.transaction("rec",mode); const q=fn(tx.objectStore("rec"));
+  tx.oncomplete=()=>res(q && q.result); tx.onerror=()=>rej(tx.error); }); }
+const memRec={};
+const recPut=(id,b)=>recOp("readwrite",x=>x.put(b,id)).catch(()=>{});
+const recClear=()=>recOp("readwrite",x=>x.clear()).catch(()=>{});
+async function getRec(id){ if(memRec[id]) return memRec[id]; try{ const b=(await recOp("readonly",x=>x.get(id)))||null; if(b) memRec[id]=b; return b; }catch(e){ return null; } }
+const extFor=m=>/mpeg|mp3/.test(m)?"mp3":/mp4|aac/.test(m)?"m4a":/ogg/.test(m)?"ogg":/wav/.test(m)?"wav":"webm";
+const plain=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\\/:*?"<>|’']/g,"").replace(/\s+/g," ").trim();
+const who=()=>plain(store.name).slice(0,60)||"sense nom";
+const recName=(t,b)=>`${who()} - ${plain(t.title)}.${extFor(b.type)}`;
+
+/* Converteix la gravació a MP3, que s’obre a tot arreu (Classroom, Drive, mòbils) */
+async function toMp3(blob){
+  try{
+    if(!window.lamejs) return blob;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return blob;
+    const ctx=new AC(); const ab=await blob.arrayBuffer();
+    const buf=await new Promise((res,rej)=>ctx.decodeAudioData(ab,res,rej));
+    if(ctx.close) ctx.close();
+    const ch=buf.numberOfChannels, len=buf.length, mono=new Float32Array(len);
+    for(let c=0;c<ch;c++){ const d=buf.getChannelData(c); for(let i=0;i<len;i++) mono[i]+=d[i]/ch; }
+    const enc=new lamejs.Mp3Encoder(1, buf.sampleRate, 64), parts=[], block=1152;
+    for(let i=0;i<len;i+=block){
+      const n=Math.min(block,len-i), p=new Int16Array(n);
+      for(let j=0;j<n;j++){ const v=Math.max(-1,Math.min(1,mono[i+j])); p[j]=v<0?v*0x8000:v*0x7FFF; }
+      const out=enc.encodeBuffer(p); if(out.length) parts.push(new Uint8Array(out));
+      if(i % (block*400)===0) await new Promise(r=>setTimeout(r,0));
+    }
+    const end=enc.flush(); if(end.length) parts.push(new Uint8Array(end));
+    return new Blob(parts,{type:"audio/mpeg"});
+  }catch(e){ return blob; }
+}
+function download(blob,name){
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+
+/* ---------- Veu ---------- */
+const synth = window.speechSynthesis;
+let frVoice = null, rate = 0.85, queue = [], qi = 0, playing = false;
+function loadVoices(){
+  if(!synth) return;
+  const v = synth.getVoices();
+  frVoice = v.find(x=>x.lang==="fr-FR" && /google|natural|premium|enhanced/i.test(x.name))
+         || v.find(x=>x.lang==="fr-FR") || v.find(x=>x.lang && x.lang.toLowerCase().startsWith("fr")) || null;
+  const w = document.getElementById("voiceWarn");
+  if(w) w.style.display = (v.length && !frVoice) ? "block" : "none";
+}
+if(synth){ loadVoices(); synth.onvoiceschanged = loadVoices; }
+function speak(text, r, onend){
+  if(!synth){ alert("Aquest navegador no pot llegir el text en veu alta."); return; }
+  const u = new SpeechSynthesisUtterance(text.replace(/^—\s*/,""));
+  u.lang = "fr-FR"; if(frVoice) u.voice = frVoice; u.rate = r || rate;
+  if(onend) u.onend = onend;
+  synth.speak(u);
+}
+function clearOn(){ document.querySelectorAll(".s.on").forEach(e=>e.classList.remove("on")); }
+function stopAll(){ playing=false; if(synth) synth.cancel(); clearOn(); setPlayLabel(); }
+function setPlayLabel(){ const b=document.getElementById("playBtn"); if(b) b.textContent = playing ? "Pausa" : "Escoltar el text"; }
+function playFrom(i){ queue=[...document.querySelectorAll("#cahier .s")]; qi=i; playing=true; setPlayLabel(); next(); }
+function next(){
+  if(!playing) return;
+  clearOn();
+  if(qi >= queue.length){ playing=false; setPlayLabel(); return; }
+  const el=queue[qi]; el.classList.add("on");
+  speak(el.dataset.t, null, ()=>{ if(!playing) return; qi++; setTimeout(next,250); });
+}
+
+/* ---------- Pestanyes ---------- */
+let cur = 0;
+function isDone(id){ const s=store.t[id]; return !!(s && s.first!=null && Object.values(s.checks||{}).filter(Boolean).length===CHECKS.length && s.rec); }
+function renderTabs(){
+  const tabs = DATA.map((t,i)=>({i,label:t.title+(isDone(t.id)?" ✓":"")})).concat([{i:DATA.length,label:"Lliurar"}]);
+  document.getElementById("tabs").innerHTML = tabs.map(t=>
+    `<button class="tab" role="tab" aria-selected="${t.i===cur}" data-i="${t.i}">${esc(t.label)}</button>`).join("");
+  document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>select(+b.dataset.i));
+}
+
+/* ---------- Text ---------- */
+function sentence(s){ return `<span class="s" tabindex="0" role="button" data-t="${esc(s)}">${esc(fr(s))}</span>`; }
+function render(){
+  if(cur===DATA.length) return renderSummary();
+  const t = DATA[cur], s = st(t.id);
+  const paras = t.paras.map(p => Array.isArray(p)
+    ? `<p>${p.map(sentence).join(" ")}</p>`
+    : `<p class="dlg">${p.d.map(sentence).join(" ")}</p>`).join("");
+  const quiz = t.quiz.map((q,qn)=>{
+    const opts = "o" in q ? q.o : ["Vrai","Faux"];
+    const label = "o" in q ? "" : `<span style="color:var(--muted);font-family:var(--sans);font-size:.95rem">Vrai ou faux ? </span>`;
+    return `<div class="q"><p>${label}${esc(fr(q.q))}</p>
+      <div class="opts">${opts.map((o,oi)=>`<label><input type="radio" name="q${qn}" value="${oi}" ${s.ans[qn]===oi?"checked":""}> ${esc(fr(o))}</label>`).join("")}</div></div>`;
+  }).join("");
+  document.getElementById("app").innerHTML = `
+    <h2>${esc(t.title)}</h2>
+    <p class="topic">${esc(t.topic)}</p>
+    <div class="player">
+      <button class="btn" id="playBtn">Escoltar el text</button>
+      <button class="btn ghost" id="stopBtn">Tornar a començar</button>
+      <label class="speed">Velocitat <input type="range" id="rate" min="0.6" max="1.1" step="0.05" value="${rate}"> <output id="rateOut">${rate.toFixed(2)}</output></label>
+    </div>
+    <p class="voice-warn" id="voiceWarn">No s’ha trobat cap veu francesa en aquest dispositiu. L’àudio pot sonar amb un altre accent.</p>
+    <p class="hint">Toca qualsevol frase per escoltar-la sola.</p>
+    <div class="cahier" id="cahier">${paras}</div>
+    <details class="vocab"><summary>Vocabulari útil</summary><dl>${t.vocab.map(([a,b])=>`<dt>${esc(fr(a))}</dt><dd>${esc(b)}</dd>`).join("")}</dl></details>
+
+    <h3>Comprensió</h3>
+    <div id="quiz">${quiz}</div>
+    <button class="btn" id="checkBtn">Corregir</button><span class="score" id="score" aria-live="polite">${s.first!=null?`Primer intent: ${s.first} de ${t.quiz.length}`:""}</span>
+
+    <h3>Expressió oral</h3>
+    <p class="hint">Respon en veu alta.</p>
+    <ul class="talk">${t.talk.map(q=>`<li>${esc(fr(q))}</li>`).join("")}</ul>
+
+    <h3>Escolta i repeteix</h3>
+    ${t.repeat.map((r,i)=>`<div class="rep"><span>${esc(fr(r))}</span>
+      <button class="btn small ghost" data-say="${i}" data-r="normal">Escoltar</button>
+      <button class="btn small ghost" data-say="${i}" data-r="slow">A poc a poc</button></div>`).join("")}
+
+    <h3>Tasca oral</h3>
+    <div class="task"><p>${esc(fr(t.task))}</p>
+      <label for="notes" class="hint" style="display:block;margin:0">Prepara-la aquí: escriu idees o frases clau. No cal escriure-ho tot.</label>
+      <textarea id="notes" class="notes" placeholder="D’abord… puis… le soir…">${esc(s.notes||"")}</textarea>
+      <div class="recbar">
+        <button class="btn" id="recBtn">Gravar-me</button>
+        <button class="btn ghost" id="dlRec" hidden>Descarregar la gravació</button>
+      </div>
+      <div class="rec-out" id="recOut"></div>
+    </div>
+
+    <h3>Abans d’acabar</h3>
+    <div class="checks">${CHECKS.map((c,ci)=>`<label><input type="checkbox" data-c="${ci}" ${s.checks[ci]?"checked":""}> ${esc(c)}</label>`).join("")}</div>`;
+  bind(t);
+  loadVoices();
+}
+function bind(t){
+  const s=st(t.id);
+  document.querySelectorAll("#cahier .s").forEach(el=>{
+    const go=()=>{ stopAll(); el.classList.add("on"); speak(el.dataset.t, null, ()=>el.classList.remove("on")); };
+    el.onclick=go; el.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); } };
+  });
+  document.getElementById("playBtn").onclick=()=>{
+    if(!synth) return speak("");
+    if(playing){ playing=false; synth.cancel(); setPlayLabel(); return; }
+    playFrom(qi && qi<queue.length ? qi : 0);
+  };
+  document.getElementById("stopBtn").onclick=()=>{ stopAll(); qi=0; };
+  const rr=document.getElementById("rate");
+  rr.oninput=()=>{ rate=+rr.value; document.getElementById("rateOut").textContent=rate.toFixed(2); };
+  document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>{ stopAll(); speak(t.repeat[+b.dataset.say], b.dataset.r==="slow"?0.65:0.9); });
+
+  document.querySelectorAll("#quiz input[type=radio]").forEach(r=>r.onchange=()=>{ s.ans[+r.name.slice(1)]=+r.value; save(); });
+  document.getElementById("checkBtn").onclick=()=>{
+    let ok=0, answered=0;
+    document.querySelectorAll("#quiz .q").forEach((q,qn)=>{
+      const qq=t.quiz[qn], a = "o" in qq ? qq.a : (qq.vf?0:1);
+      const sel=q.querySelector("input:checked");
+      q.querySelectorAll("label").forEach(l=>l.classList.remove("right","wrong"));
+      if(sel){ answered++;
+        if(+sel.value===a){ ok++; sel.parentElement.classList.add("right"); }
+        else { sel.parentElement.classList.add("wrong"); q.querySelector(`input[value="${a}"]`).parentElement.classList.add("right"); }
+      }
+    });
+    const total=t.quiz.length, sc=document.getElementById("score");
+    if(answered<total){ sc.textContent=`Falten ${total-answered} preguntes per respondre`; return; }
+    const firstNow = s.first==null;
+    if(firstNow) s.first=ok;
+    s.last=ok; save(); renderTabs();
+    sc.textContent = firstNow ? `${ok} de ${total} correctes` : `${ok} de ${total} correctes · primer intent: ${s.first} de ${total}`;
+  };
+  const notes=document.getElementById("notes");
+  notes.oninput=()=>{ s.notes=notes.value; clearTimeout(notesTimer); notesTimer=setTimeout(save,600); };
+  document.querySelectorAll(".checks input").forEach(c=>c.onchange=()=>{ s.checks[c.dataset.c]=c.checked; save(); renderTabs(); });
+  setupRecorder(t);
+}
+
+/* ---------- Gravadora ---------- */
+let rec=null, chunks=[], recUrl=null, recTimer=null;
+const MAX_SEC=180;
+function showRec(t,blob){
+  const out=document.getElementById("recOut"), dl=document.getElementById("dlRec");
+  if(!out) return;
+  if(recUrl) URL.revokeObjectURL(recUrl);
+  recUrl=URL.createObjectURL(blob);
+  out.innerHTML=`✓ Gravació desada. Escolta’t i compara-la amb el model:<audio controls src="${recUrl}"></audio>`;
+  dl.hidden=false; dl.onclick=()=>download(blob, recName(t,blob));
+}
+function setupRecorder(t){
+  const btn=document.getElementById("recBtn"), out=document.getElementById("recOut");
+  getRec(t.id).then(b=>{ if(b && DATA[cur]===t){ showRec(t,b); btn.textContent="Gravar de nou"; } });
+  btn.onclick=async()=>{
+    if(rec && rec.state==="recording"){ rec.stop(); return; }
+    let stream;
+    try{
+      stopAll();
+      stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    }catch(e){
+      out.textContent="No s’ha pogut fer servir el micròfon. Dona permís al navegador per gravar i torna-ho a provar.";
+      return;
+    }
+    chunks=[]; rec=new MediaRecorder(stream);
+    rec.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+    rec.onstop=async()=>{
+      clearTimeout(recTimer);
+      stream.getTracks().forEach(x=>x.stop());
+      btn.disabled=true; btn.textContent="Preparant la gravació…";
+      const raw=new Blob(chunks,{type:(rec.mimeType||"audio/webm").split(";")[0]});
+      const blob=await toMp3(raw);
+      memRec[t.id]=blob; await recPut(t.id,blob);
+      st(t.id).rec=true; save(); renderTabs();
+      btn.disabled=false; btn.textContent="Gravar de nou";
+      if(DATA[cur]===t) showRec(t,blob);
+    };
+    rec.start();
+    recTimer=setTimeout(()=>{ if(rec && rec.state==="recording") rec.stop(); }, MAX_SEC*1000);
+    btn.textContent="Aturar la gravació";
+    document.getElementById("dlRec").hidden=true;
+    out.textContent=`● Gravant… parla amb calma (com a màxim ${MAX_SEC/60} minuts).`;
+  };
+}
+
+/* ---------- Resum en PDF ---------- */
+function makePdf(recs){
+  const J = window.jspdf && window.jspdf.jsPDF; if(!J) return null;
+  const doc = new J({unit:"mm", format:"a4"});
+  const W=210, M=18, maxW=W-2*M; let y=20;
+  const clean = t => String(t).replace(/[\u202F\u00A0]/g," ");
+  const ensure = h => { if(y+h>282){ doc.addPage(); y=20; } };
+  function line(t,o={}){
+    const size=o.size||11, indent=o.indent||0;
+    doc.setFont("helvetica", o.bold?"bold":"normal"); doc.setFontSize(size);
+    doc.setTextColor(...(o.color||[35,38,46]));
+    const lh=size*0.43;
+    doc.splitTextToSize(clean(t), maxW-indent).forEach(part=>{ ensure(lh); doc.text(part, M+indent, y); y+=lh; });
+    y += (o.gap ?? 1.6);
+  }
+  const INK=[30,43,92], MUTED=[91,96,112], OK=[31,122,77], KO=[179,55,47];
+  line("Français A2 · Lliurament",{size:18,bold:true,color:INK,gap:2});
+  line(`${store.name||"(sense nom)"} · ${new Date().toLocaleDateString("ca-ES")}`,{color:MUTED,gap:6});
+  DATA.forEach(t=>{
+    const s=store.t[t.id]||{}, ans=s.ans||{}, checks=s.checks||{}, total=t.quiz.length;
+    ensure(24); doc.setDrawColor(159,178,223); doc.setLineWidth(0.4); doc.line(M,y,W-M,y); y+=7;
+    line(t.title,{size:14,bold:true,color:INK,gap:1});
+    line(t.topic,{size:10,color:MUTED,gap:4});
+    line("Comprensió",{bold:true,gap:1});
+    line(s.first!=null
+      ? `Primer intent: ${s.first} de ${total}` + (s.last!=null && s.last!==s.first ? ` · Últim intent: ${s.last} de ${total}` : "")
+      : "Encara no s’ha corregit.",{indent:2,gap:2.5});
+    t.quiz.forEach((q,i)=>{
+      const opts = "o" in q ? q.o : ["Vrai","Faux"], a = "o" in q ? q.a : (q.vf?0:1), g = ans[i];
+      line(`${i+1}. ${"o" in q ? "" : "Vrai ou faux ? "}${fr(q.q)}`,{indent:2,gap:0.6});
+      if(g==null) line("Sense resposta",{indent:7,color:MUTED,gap:2});
+      else if(g===a) line(`${fr(opts[g])} · correcta`,{indent:7,color:OK,gap:2});
+      else line(`${fr(opts[g])} · incorrecta (resposta correcta: ${fr(opts[a])})`,{indent:7,color:KO,gap:2});
+    });
+    y+=1.5;
+    line("Pràctica oral",{bold:true,gap:1});
+    CHECKS.forEach((c,ci)=>line(`${checks[ci]?"[x]":"[  ]"}  ${c}`,{indent:2,gap:0.8}));
+    y+=1;
+    line(recs[t.id] ? `Gravació: ${recName(t,recs[t.id])}` : "Gravació: no feta",{indent:2,color:recs[t.id]?OK:KO,gap:2.5});
+    if(s.notes && s.notes.trim()){
+      line("Preparació de la tasca oral",{bold:true,gap:1});
+      line(s.notes.trim(),{indent:2,gap:3});
+    }
+    y+=3;
+  });
+  const pages=doc.getNumberOfPages();
+  for(let i=1;i<=pages;i++){ doc.setPage(i); doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...MUTED);
+    doc.text(`${clean(store.name||"")}  ·  pàgina ${i} de ${pages}`, W-M, 290, {align:"right"}); }
+  return doc.output("blob");
+}
+
+/* ---------- Lliurar ---------- */
+async function renderSummary(){
+  const recs={}; for(const t of DATA) recs[t.id]=await getRec(t.id);
+  if(cur!==DATA.length) return;
+  const lines=[`Français A2 · ${store.name||"(sense nom)"} · ${new Date().toLocaleDateString("ca-ES")}`,""];
+  DATA.forEach(t=>{
+    const s=store.t[t.id]||{}, total=t.quiz.length;
+    const comp=(s.first!=null)
+      ? `${s.first}/${total} al primer intent`+(s.last!=null && s.last!==s.first ? `, ${s.last}/${total} a l’últim` : "")
+      : "no feta";
+    const n=Object.values(s.checks||{}).filter(Boolean).length;
+    lines.push(t.title, `  Comprensió: ${comp}`, `  Pràctica oral: ${n} de ${CHECKS.length} passos fets`, `  Gravació: ${recs[t.id]?"sí":"no"}`);
+    if(s.notes && s.notes.trim()) lines.push(`  Preparació de la tasca oral:`, ...s.notes.trim().split("\n").map(l=>"    "+l));
+    lines.push("");
+  });
+  const txt=lines.join("\n").trim();
+  const hasPdf=!!(window.jspdf && window.jspdf.jsPDF);
+  const sumName=`${who()} - resum.${hasPdf?"pdf":"txt"}`;
+  document.getElementById("app").innerHTML=`
+    <h2>Lliurar</h2>
+    ${store.name ? "" : `<p class="voice-warn" style="display:block">Escriu el teu nom a dalt de tot abans de descarregar els fitxers, perquè portin el teu nom.</p>`}
+    <h3 style="margin-top:1rem">Els teus fitxers</h3>
+    <ul class="files">
+      <li><span>${esc(sumName)}</span><button class="btn small ghost" data-dl="sum">Descarregar</button></li>
+      ${DATA.map(t=>recs[t.id]
+        ? `<li><span>${esc(recName(t,recs[t.id]))}</span><button class="btn small ghost" data-dl="${t.id}">Descarregar</button></li>`
+        : `<li><span class="none">${esc(t.title)}: encara no t’has gravat</span><button class="btn small ghost" data-go="${DATA.indexOf(t)}">Anar-hi</button></li>`).join("")}
+    </ul>
+    <button class="btn" id="dlAll">Descarregar-ho tot</button><span class="score" id="msg" aria-live="polite"></span>
+
+    <h3>Com pujar-ho al Classroom</h3>
+    <ol class="how">
+      <li>Descarrega els fitxers. Es guarden a la carpeta Baixades (al mòbil, a l’app Fitxers).</li>
+      <li>Obre la tasca al Classroom i prem «Afegeix o crea» › «Fitxer». Al mòbil, toca la icona del clip.</li>
+      <li>Tria el PDF del resum i les gravacions que has descarregat. Pots seleccionar-los tots alhora.</li>
+      <li>Prem «Lliura».</li>
+    </ol>
+
+    <h3>Vista prèvia del resum</h3>
+    <textarea id="sumTxt" readonly rows="${Math.min(lines.length,24)}" aria-label="Resum">${esc(txt)}</textarea>
+    <p class="hint" style="margin-top:1.8rem">Les respostes i les gravacions es desen en aquest navegador. Si canvies d’ordinador o de navegador, començaràs de zero.</p>
+    <button class="btn ghost small" id="resetBtn">Esborrar el meu progrés</button>`;
+  const msg=document.getElementById("msg");
+  const sumBlob=()=>(hasPdf && makePdf(recs)) || new Blob([txt],{type:"text/plain;charset=utf-8"});
+  document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.dl;
+    if(id==="sum") download(sumBlob(), sumName);
+    else { const t=DATA.find(d=>d.id===id); download(recs[id], recName(t,recs[id])); }
+  });
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>select(+b.dataset.go));
+  document.getElementById("dlAll").onclick=async()=>{
+    const files=[[sumBlob(),sumName]];
+    DATA.forEach(t=>{ if(recs[t.id]) files.push([recs[t.id], recName(t,recs[t.id])]); });
+    for(const [b,n] of files){ download(b,n); await new Promise(r=>setTimeout(r,700)); }
+    msg.textContent=`${files.length} fitxers descarregats. Ara puja’ls a la tasca del Classroom.`;
+  };
+  document.getElementById("resetBtn").onclick=async()=>{
+    if(!confirm("Vols esborrar les respostes i les gravacions desades en aquest navegador?")) return;
+    store={name:"",t:{}}; save(); for(const k in memRec) delete memRec[k]; await recClear();
+    document.getElementById("nom").value=""; renderTabs(); render();
+  };
+}
+
+/* ---------- Inici ---------- */
+const nom=document.getElementById("nom");
+nom.value=store.name||"";
+let nameTimer=null;
+nom.oninput=()=>{ store.name=nom.value.trim(); clearTimeout(nameTimer); nameTimer=setTimeout(()=>{ save(); if(cur===DATA.length) renderSummary(); },500); };
+window.addEventListener("pagehide", save);
+
+function hashId(i){ return i<DATA.length ? DATA[i].id : "lliurar"; }
+function select(i){
+  if(rec && rec.state==="recording") rec.stop();
+  stopAll(); qi=0; cur=i; renderTabs(); render();
+  try{ history.replaceState(null,"","#"+hashId(i)); }catch(e){}
+  window.scrollTo({top:0});
+}
+const start = location.hash==="#lliurar" ? DATA.length : DATA.findIndex(d=>"#"+d.id===location.hash);
+cur = start>=0 ? start : 0;
+renderTabs(); render();
+</script>
+</body>
+</html>
